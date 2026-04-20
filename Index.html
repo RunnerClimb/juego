@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuenta y pinta</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #fff8dc, #ffe9f3);
+      color: #333;
+      text-align: center;
+    }
+
+    .contenedor {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    .titulo {
+      font-size: 2.2rem;
+      margin: 12px 0 8px;
+      color: #ff6b35;
+    }
+
+    .subtitulo {
+      font-size: 1.1rem;
+      margin: 0 0 18px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .numero {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #ff7a00;
+      margin: 8px 0;
+      line-height: 1;
+    }
+
+    .instruccion {
+      font-size: 2rem;
+      margin: 12px 0 20px;
+      color: #444;
+      min-height: 48px;
+    }
+
+    .botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 10px 0 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    .btn-voz {
+      background: #7bdff2;
+      color: #17324d;
+    }
+
+    .btn-nueva {
+      background: #b2f7b6;
+      color: #1b4332;
+    }
+
+    .btn-limpiar {
+      background: #ffd6a5;
+      color: #7f4f24;
+    }
+
+    .mensaje {
+      min-height: 48px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0 18px;
+    }
+
+    .contador {
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      color: #555;
+    }
+
+    .grilla {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(70px, 120px));
+      gap: 16px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      background: #d9d9d9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.3rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.35);
+    }
+
+    .item:hover {
+      transform: scale(1.04);
+    }
+
+    .item.pintado {
+      background: #ffd54f;
+      box-shadow: 0 8px 16px rgba(255, 193, 7, 0.28);
+    }
+
+    .pie {
+      margin-top: 18px;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 700px) {
+      .titulo {
+        font-size: 1.8rem;
+      }
+
+      .numero {
+        font-size: 4rem;
+      }
+
+      .instruccion {
+        font-size: 1.5rem;
+      }
+
+      .mensaje {
+        font-size: 1.4rem;
+      }
+
+      .grilla {
+        grid-template-columns: repeat(3, minmax(70px, 100px));
+      }
+
+      .item {
+        font-size: 2.7rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .grilla {
+        grid-template-columns: repeat(3, minmax(65px, 92px));
+        gap: 12px;
+      }
+
+      .item {
+        font-size: 2.3rem;
+        border-radius: 18px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1 class="titulo">Cuenta y pinta</h1>
+    <p class="subtitulo">Toca la cantidad correcta</p>
+
+    <div class="panel">
+      <div id="numeroObjetivo" class="numero">3</div>
+      <div id="instruccion" class="instruccion">Pinta 3 ovejas</div>
+
+      <div class="botones">
+        <button class="btn-voz" onclick="leerInstruccion()">🔊 Escuchar</button>
+        <button class="btn-nueva" onclick="nuevaRonda()">➡️ Siguiente</button>
+        <button class="btn-limpiar" onclick="limpiarSeleccion()">🧽 Limpiar</button>
+      </div>
+
+      <div id="mensaje" class="mensaje"></div>
+      <div id="contador" class="contador">Llevas 0</div>
+
+      <div id="grilla" class="grilla"></div>
+    </div>
+
+    <div class="pie">Hecho para practicar conteo del 1 al 5</div>
+  </div>
+
+  <script>
+    const elementos = [
+      { singular: "oveja", plural: "ovejas", emoji: "🐑" },
+      { singular: "patito", plural: "patitos", emoji: "🐥" },
+      { singular: "estrella", plural: "estrellas", emoji: "⭐" },
+      { singular: "manzana", plural: "manzanas", emoji: "🍎" },
+      { singular: "globo", plural: "globos", emoji: "🎈" },
+      { singular: "flor", plural: "flores", emoji: "🌸" }
+    ];
+
+    let objetivo = 3;
+    let seleccionados = 0;
+    let totalItems = 8;
+    let juegoTerminado = false;
+    let elementoActual = elementos[0];
+    let ultimoMensajeHablado = "";
+
+    const numeroObjetivo = document.getElementById("numeroObjetivo");
+    const instruccion = document.getElementById("instruccion");
+    const mensaje = document.getElementById("mensaje");
+    const contador = document.getElementById("contador");
+    const grilla = document.getElementById("grilla");
+
+    function hablar(texto) {
+      if (!("speechSynthesis" in window)) return;
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = "es-CL";
+      utterance.rate = 0.9;
+      utterance.pitch = 1.05;
+      utterance.volume = 1;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function textoElemento(cantidad) {
+      return cantidad === 1 ? elementoActual.singular : elementoActual.plural;
+    }
+
+    function actualizarCabecera() {
+      numeroObjetivo.textContent = objetivo;
+      instruccion.textContent = `Pinta ${objetivo} ${textoElemento(objetivo)}`;
+    }
+
+    function leerInstruccion() {
+      hablar(`Pinta ${objetivo} ${textoElemento(objetivo)}`);
+    }
+
+    function mostrarMensaje(texto, color, hablarTexto = null) {
+      mensaje.textContent = texto;
+      mensaje.style.color = color;
+
+      if (hablarTexto && ultimoMensajeHablado !== hablarTexto) {
+        hablar(hablarTexto);
+        ultimoMensajeHablado = hablarTexto;
+      }
+    }
+
+    function actualizarContador() {
+      contador.textContent = `Llevas ${seleccionados}`;
+    }
+
+    function crearGrilla() {
+      grilla.innerHTML = "";
+      seleccionados = 0;
+      juegoTerminado = false;
+      ultimoMensajeHablado = "";
+      mensaje.textContent = "";
+      contador.textContent = "Llevas 0";
+
+      for (let i = 0; i < totalItems; i++) {
+        const item = document.createElement("div");
+        item.className = "item";
+        item.textContent = elementoActual.emoji;
+
+        item.addEventListener("click", function () {
+          if (juegoTerminado) return;
+
+          if (item.classList.contains("pintado")) {
+            item.classList.remove("pintado");
+            seleccionados--;
+          } else {
+            item.classList.add("pintado");
+            seleccionados++;
+          }
+
+          actualizarContador();
+          revisarResultado();
+        });
+
+        grilla.appendChild(item);
+      }
+    }
+
+    function revisarResultado() {
+      if (seleccionados === objetivo) {
+        mostrarMensaje("¡Muy bien! 🎉", "green", "Muy bien");
+        juegoTerminado = true;
+      } else if (seleccionados > objetivo) {
+        mostrarMensaje("Inténtalo de nuevo 😊", "crimson", "Inténtalo de nuevo");
+      } else {
+        mensaje.textContent = "";
+        ultimoMensajeHablado = "";
+      }
+    }
+
+    function limpiarSeleccion() {
+      const items = document.querySelectorAll(".item");
+      items.forEach(item => item.classList.remove("pintado"));
+      seleccionados = 0;
+      juegoTerminado = false;
+      ultimoMensajeHablado = "";
+      mensaje.textContent = "";
+      actualizarContador();
+      leerInstruccion();
+    }
+
+    function nuevaRonda() {
+      objetivo = Math.floor(Math.random() * 5) + 1;
+      elementoActual = elementos[Math.floor(Math.random() * elementos.length)];
+      totalItems = 8;
+
+      actualizarCabecera();
+      crearGrilla();
+
+      setTimeout(() => {
+        leerInstruccion();
+      }, 250);
+    }
+
+    window.addEventListener("load", function () {
+      nuevaRonda();
+    });
+  </script>
+</body>
+</html>
